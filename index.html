@@ -1,0 +1,258 @@
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>𝔸ℕ𝕌ℝ𝔸𝔾 ~ 𝔸ℝ𝕄𝕐</title>
+
+<!-- PERF: preconnect before fonts load, cuts DNS + TLS handshake time -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<!-- PERF: only load the weights actually used (700,900), stripped unused Exo 2 weights -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@700;900&display=swap" rel="stylesheet"/>
+
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #0a0a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Exo 2', sans-serif;
+    padding: 20px;
+    /* PERF: prevent subpixel AA cost on body */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .card {
+    background: #050520;
+    /* PERF: single border instead of animating box-shadow on card */
+    border: 3px solid #00ff41;
+    border-radius: 22px;
+    /* PERF: reduced to 1 shadow layer — 3 layers on older devices = repaint hell */
+    box-shadow: 0 0 22px rgba(0,255,65,0.45);
+    padding: 36px 28px 40px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    /* PERF: isolate stacking context, prevents full-page repaints */
+    contain: layout style;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,255,65,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    /* PERF: static, no repaint needed */
+  }
+
+  /* ── LOGO ── */
+  .logo-wrap {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 28px;
+    /* PERF: promote to own layer — ring animation won't repaint the rest of the card */
+    will-change: transform;
+  }
+
+  /* PERF: replaced box-shadow animation with opacity animation on a pseudo-element
+     opacity is GPU-composited — zero repaint cost on old devices */
+  .logo-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 4px solid #00d4aa;
+    box-shadow: 0 0 16px #00d4aa;
+    animation: ringPulse 2.5s ease-in-out infinite;
+    z-index: 1;
+    will-change: opacity;
+  }
+
+  @keyframes ringPulse {
+    0%,100% { opacity: 0.7; }
+    50%      { opacity: 1; }
+  }
+
+  .logo-img {
+    position: absolute;
+    inset: 6px;
+    width: calc(100% - 12px);
+    height: calc(100% - 12px);
+    border-radius: 50%;
+    object-fit: cover;
+    /* PERF: tells browser exact size before load — prevents layout shift */
+    aspect-ratio: 1;
+  }
+
+  /* ── TITLE ── */
+  .title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(12px, 4vw, 18px);
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 1px;
+    margin-bottom: 22px;
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(255,255,255,0.25);
+  }
+
+  /* ── STATS LIST ── */
+  .stats {
+    list-style: none;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stats li {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #e8e8e8;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #f5c200 0%, #e09000 100%);
+    color: #1a0800;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 1px;
+    padding: 16px 32px;
+    border-radius: 10px;
+    width: 100%;
+    border: 2px solid rgba(255,220,50,0.6);
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 18px rgba(240,180,0,0.4);
+    margin-bottom: 28px;
+    will-change: transform;
+    animation: btnPulse 1.2s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* shine sweep */
+  .cta-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 55%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: btnShine 1.8s ease-in-out infinite;
+  }
+
+  @keyframes btnShine {
+    0%        { left: -100%; }
+    50%, 100% { left: 150%; }
+  }
+
+  @keyframes btnPulse {
+    0%,100% { transform: scale(1);    box-shadow: 0 4px 18px rgba(240,180,0,0.4); }
+    50%      { transform: scale(1.03); box-shadow: 0 6px 28px rgba(240,180,0,0.75), 0 0 0 5px rgba(240,180,0,0.15); }
+  }
+
+  .cta-btn:hover {
+    animation: none;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 32px rgba(240,180,0,0.7), 0 0 0 6px rgba(240,180,0,0.2);
+  }
+  .cta-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* ── COMMUNITY TEXT ── */
+  .community {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: #ffffff;
+    line-height: 1.35;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── HURRY UP ── */
+  .hurry {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: #00ff41;
+    letter-spacing: 2px;
+    /* PERF: single shadow, animate only opacity — eliminates per-frame shadow recalc */
+    text-shadow: 0 0 18px rgba(0,255,65,0.8);
+    animation: glowPulse 1.6s ease-in-out infinite;
+    will-change: opacity;
+  }
+
+  /* PERF: opacity-only animation = pure GPU composite, zero CPU cost */
+  @keyframes glowPulse {
+    0%,100% { opacity: 0.8; }
+    50%      { opacity: 1; }
+  }
+</style>
+  
+</head>
+<body>
+
+<div class="card">
+
+  <!-- LOGO — PERF: explicit width/height prevents layout shift while image loads -->
+  <div class="logo-wrap">
+    <img
+      src="logo.png"
+      alt="Jalwa Game Logo"
+      class="logo-img"
+      width="138"
+      height="138"
+      fetchpriority="high"
+      decoding="async"
+    />
+  </div>
+
+  <div class="title">𝔸ℕ𝕌ℝ𝔸𝔾 ~ 𝔸ℝ𝕄𝕐</div>
+
+  <ul class="stats">
+    <li><span>🌈</span> 98% SIGNAL ACCURACY</li>
+    <li><span>📊</span> 10K+ ACTIVE MEMBERS</li>
+    <li><span>⚡</span> DAILY COLOUR UPDATES</li>
+  </ul>
+
+  <a href="https://telegram.me/+IC-0SXNqlPs4ODA1" target="_blank" rel="noopener noreferrer" class="cta-btn" style="white-space:nowrap;font-size:13px;padding:16px 16px;">
+    🚀 JOIN TELEGRAM CHANNEL
+  </a>
+
+  <div class="community">𝔸ℕ𝕌ℝ𝔸𝔾 ~ 𝔸ℝ𝕄𝕐<br>INDIA'S ACTIVE PLAYERS<br>COMMUNITY 🚀</div>
+
+  <div class="hurry">HURRRY UP !!</div>
+
+</div>
+
+</body>
+</html>
